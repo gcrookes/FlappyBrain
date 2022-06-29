@@ -2,6 +2,7 @@ from xml.dom.expatbuilder import FilterVisibilityController
 import pygame
 import random
 import os
+import sys
 import time
 
 from pygame.locals import (
@@ -11,7 +12,7 @@ from pygame.locals import (
     KEYDOWN,
     QUIT)
 
-SCREEN_WIDTH = 1500
+SCREEN_WIDTH = 1250
 SCREEN_HEIGHT = 650
 green = (0, 255, 0)
 
@@ -78,6 +79,16 @@ class Enemy(pygame.sprite.Sprite):
     def get_surfs(self):
         return self.pipe_bottom, self.pipe_top
 
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        
+        base_path = os.path.dirname(__file__)
+        
+
+    return os.path.join(base_path, relative_path)
+
 
 class TextColumns:
     def __init__(self, x, numbers):
@@ -128,9 +139,13 @@ def game():
     
     screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
 
-    player_image = pygame.image.load(os.path.join(os.path.dirname(__file__),"res\Brain.png"))
-    obstacle_image = pygame.image.load(os.path.join(os.path.dirname(__file__),"res\Pipe.png"))
-    floor_image = pygame.image.load(os.path.join(os.path.dirname(__file__),"res\Floor.png"))
+    player_path = resource_path("res\Brain.png")
+    obstacle_path = resource_path("res\Pipe.png")
+    floor_path = resource_path("res\Floor.png")
+
+    player_image = pygame.image.load(os.path.join(player_path))
+    obstacle_image = pygame.image.load(os.path.join(obstacle_path))
+    floor_image = pygame.image.load(os.path.join(floor_path))
     
     pygame.display.set_caption("NatHacks Flappy Brain")
     pygame.display.set_icon(player_image)
@@ -151,18 +166,17 @@ def game():
     all_sprites.add(player)
 
     i = 0
+    score = 0
     
     while running:
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-                break
+                return score, False
 
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    running = False
-                    break
+                    return score, False
 
             if event.type == ADDENEMY:
                 new_enemy = Enemy(obstacle_image, enemy_speed)
@@ -208,7 +222,7 @@ def game():
         pygame.display.flip()
         clock.tick(30)
     
-    return score
+    return score, True
 
 def menu(score):
 
@@ -254,12 +268,11 @@ if __name__ == "__main__":
     
     pygame.init()
 
-    score = game()
+    score, cont = game()
 
-    cont = True
     while cont: 
         cont = menu(score)
         if cont:
-            score = game()
+            score, cont = game()
 
     pygame.quit()
