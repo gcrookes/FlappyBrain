@@ -27,6 +27,8 @@ class Player(pygame.sprite.Sprite):
         self.max_count = 5 
         self.count = 0 
         self.jumping = 0
+        self.image = image
+        self.angle = 0
 
     def update(self, pressed_keys):
 
@@ -40,8 +42,23 @@ class Player(pygame.sprite.Sprite):
             self.rect.move_ip(0, -8)
             self.jumping -= 1
             self.count = self.max_count
+
+            if self.angle <20:
+                self.angle += 2
+            
+
         else:
             self.rect.move_ip(0,4)
+
+            if self.angle > 0:
+                self.angle -= 2
+
+        surf_rect = self.surf.get_rect()
+        rotated_image = pygame.transform.rotate(self.image, self.angle)
+        rotated_image_rect = rotated_image.get_rect(center = surf_rect.center)
+        self.surf.fill((0,0,0,0))
+        self.surf.blit(rotated_image, rotated_image_rect)
+
 
         if self.rect.top <= 75:
             self.rect.top = 75
