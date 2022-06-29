@@ -117,10 +117,8 @@ class TextColumns:
             text_rect.move_ip(self.x, self.font_size * (yoffset - i))
             self.numbers.append((text, text_rect))
 
-def main():
+def game():
     
-    pygame.init()
-
     start_time = time.time()
 
     columns = 60 
@@ -177,8 +175,6 @@ def main():
         for tc in text_columns:
             tc.blit_numbers(screen)
 
-
-
         i += enemy_speed
 
         if i == floor_image.get_width(): 
@@ -203,17 +199,67 @@ def main():
             player.kill() 
             running = False
 
-
-        score_text = score_font.render(str(int(2*(time.time() - start_time))), True, green)
+        score = str(int(2*(time.time() - start_time)))
+        score_text = score_font.render(score, True, green)
         score_text_rect = score_text.get_rect(center = (SCREEN_WIDTH/2, 30))
 
         
         screen.blit(score_text, score_text_rect)
         pygame.display.flip()
         clock.tick(30)
+    
+    return score
+
+def menu(score):
+
+    screen = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
+    screen.fill('black')
+    running = True
+
+    font = pygame.font.SysFont('matrix', 60)
+    title_text = font.render("Your Score!", False, "green")
+    title_rect = title_text.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 5))
+    screen.blit(title_text, title_rect)
+
+    cont_text = font.render("Press Space to Play Again", False, "green")
+    cont_rect = cont_text.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT * 2 // 3))
+    screen.blit(cont_text, cont_rect)
+
+    score_font = pygame.font.SysFont('matrix', 120)
+    score_text = score_font.render(str(score), False, "green")
+    score_rect = score_text.get_rect(center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 3))
+    screen.blit(score_text, score_rect)
 
 
-    pygame.quit()
+    pygame.display.flip()
+
+    while running:
+
+        for event in pygame.event.get():
+            
+            if event.type == pygame.QUIT:
+                return False
+
+            if event.type == KEYDOWN and event.key == K_ESCAPE:
+                return False
+
+            if event.type == KEYDOWN and event.key == K_SPACE:
+                return True
+                    
+
+        
+
 
 if __name__ == "__main__":
-    main()
+    
+    pygame.init()
+
+    score = game()
+
+    cont = True
+    while cont: 
+        cont = menu(score)
+        if cont:
+            score = game()
+
+    pygame.quit()
